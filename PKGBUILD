@@ -2,7 +2,7 @@
 # Contributor: AndyRTR <andyrtr@archlinux.org>
 
 pkgname=xorg-xwayland-git
-pkgver=23.2.6.r429.gc7d56b0e2
+pkgver=24.0.99.1.r942.g596db5424
 pkgrel=1
 arch=('x86_64')
 license=('custom')
@@ -10,7 +10,7 @@ groups=('xorg')
 url="https://xorg.freedesktop.org"
 pkgdesc="Run X clients under Wayland (git version)"
 depends=('nettle' 'libegl' 'libepoxy' 'systemd-libs' 'libxfont2'
-         'pixman' 'xorg-server-common' 'libxcvt')
+         'pixman' 'xorg-server-common' 'libxcvt' 'libglvnd')
 makedepends=('meson' 'git'
              'xorgproto-git' 'xtrans'
              'pixman' 'libxkbfile' 'libxfont2' 'dbus'
@@ -20,7 +20,7 @@ makedepends=('meson' 'git'
              'systemd'
              'egl-wayland'
 )
-source=("xserver::git+https://gitlab.freedesktop.org/xorg/xserver.git")
+source=("git+https://gitlab.freedesktop.org/xorg/xserver.git#branch=xwayland-24.1")
 sha256sums=('SKIP')
 provides=('xorg-xwayland' 'xorg-server-xwayland' 'xorg-server-xwayland-git')
 conflicts=('xorg-xwayland' 'xorg-server-xwayland' 'xorg-server-xwayland-git')
@@ -28,11 +28,12 @@ replaces=('xorg-server-xwayland-git')
 
 pkgver() {
   cd xserver
-  local branch=origin/xwayland-23.2
-  local head=$(git rev-parse --short HEAD)
-  local tag=$(git describe --abbrev=0 "$branch")
-  local revisions=$(git rev-list "${tag}..HEAD" --count)
-  printf "%s.r%d.g%s" "$(echo "$tag" | sed 's/^xwayland.//')" "$revisions" "$head"
+  # replace latest tag with version from meson
+  local _meson_ver=`grep -m 1 version meson.build | cut -d\' -f 2`
+  # cutting off 'xorg.server.' prefix that presents in the git tag
+  local _git_ver=`git describe --long --tags | sed 's/^xorg.server.//;s/\([^-]*-g\)/r\1/;s/-/./g'`
+  local _git_tag=`git describe --tags --abbrev=0 | sed 's/^xorg.server.//'`
+  printf "${_git_ver/$_git_tag/$_meson_ver}"
 }
 
 build() {
