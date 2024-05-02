@@ -2,7 +2,7 @@
 # Contributor: AndyRTR <andyrtr@archlinux.org>
 
 pkgname=xorg-xwayland-git
-pkgver=24.0.99.901.r1.g9f4d612e7
+pkgver=24.0.99.902.r0.g5a4b65433
 pkgrel=1
 arch=('x86_64')
 license=('custom')
